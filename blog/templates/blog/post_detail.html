@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <!-- Blog Post -->
+  <h2>{{ post.title }}</h2>
+  <p class="text-muted">By {{ post.author }} | {{ post.created_at|date:"M d, Y" }}</p>
+  <p>{{ post.content }}</p>
+
+  <hr>
+
+  <!-- Comments Section -->
+  <h5>Comments ({{ comments.count }})</h5>
+  {% for comment in comments %}
+    <div class="border p-3 mb-3 rounded">
+      <strong>{{ comment.author }}</strong>
+      <small class="text-muted">on {{ comment.created_at|date:"M d, Y H:i" }}</small>
+      <p class="mb-1">{{ comment.content }}</p>
+
+      {% if user == comment.author %}
+        <div class="mt-2">
+          <a href="{% url 'blog:edit_comment' comment.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+          <a href="{% url 'blog:delete_comment' comment.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+        </div>
+      {% endif %}
+    </div>
+  {% empty %}
+    <p>No comments yet.</p>
+  {% endfor %}
+
+  <hr>
+
+  <!-- Add Comment Form -->
+  {% if user.is_authenticated %}
+    <h5>Add a Comment</h5>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary btn-sm">Post Comment</button>
+    </form>
+  {% else %}
+    <p>You must <a href="{% url 'login' %}">log in</a> to comment.</p>
+  {% endif %}
+</div>
+{% endblock %}
